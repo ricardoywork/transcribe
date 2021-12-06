@@ -3,5 +3,4 @@ from model.transcription import (
     Transcription,
     TokenizedTranscription,
     Episode,
-    MAX_EPISODE_TIME,
 )

@@ -10,7 +10,6 @@ from model import (
     Transcription,
     TokenizedTranscription,
     Episode,
-    MAX_EPISODE_TIME,
 )
 
 EPSILON = 1e-10
@@ -79,7 +78,7 @@ def time_transcript_generator(content: str) -> Iterator[tuple[float, str]]:
 
 
 def ini_end_transcript_generator(
-    content: str, episode_length: float = MAX_EPISODE_TIME
+    content: str, episode_length: float
 ) -> Iterator[tuple[float, float, str]]:
     """
     Yield the tuple(start time, end time, transcript) for content. The start time for an episode
@@ -113,7 +112,7 @@ class AbstractTranscriptionIndex(ABC):
         """
 
     @abstractmethod
-    def add(self, episode_id: str, content: str, episode_length: float = MAX_EPISODE_TIME) -> None:
+    def add(self, episode_id: str, content: str, episode_length: float) -> None:
         """
         Index the content from transcript for episode identified by episode_id. The format is:
 
@@ -128,9 +127,7 @@ class BinarySearchTranscriptionIndex(AbstractTranscriptionIndex):
         self.episodes: dict[str, Episode] = {}
         self.tokenizer = tokenizer
 
-    def add(
-        self, episode_id: str, content: str, episode_length: float = MAX_EPISODE_TIME
-    ) -> None:
+    def add(self, episode_id: str, content: str, episode_length: float) -> None:
         ep = Episode(id=episode_id)
 
         for ini, end, raw_transcription in ini_end_transcript_generator(
@@ -142,19 +139,14 @@ class BinarySearchTranscriptionIndex(AbstractTranscriptionIndex):
             tokens = self.tokenizer.tokenize(raw_transcription)
             n = len(tokens)
             for i in range(n):
-                if end == MAX_EPISODE_TIME:
-                    t.tokenized_transcriptions.append(
-                        TokenizedTranscription(ini=ini, end=ini, text=tokens[i])
+                time_per_token = (end - ini) / n
+                t.tokenized_transcriptions.append(
+                    TokenizedTranscription(
+                        ini=ini + i * time_per_token + EPSILON,
+                        end=(ini + (i + 1) * time_per_token) - EPSILON,
+                        text=tokens[i],
                     )
-                else:
-                    time_per_token = (end - ini) / n
-                    t.tokenized_transcriptions.append(
-                        TokenizedTranscription(
-                            ini=ini + i * time_per_token + EPSILON,
-                            end=(ini + (i + 1) * time_per_token) - EPSILON,
-                            text=tokens[i],
-                        )
-                    )
+                )
             ep.transcriptions.append(t)
 
         self.episodes[episode_id] = ep

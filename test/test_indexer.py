@@ -80,7 +80,7 @@ def test_time_transcript_generator_should_ignore_lines_if_necessary() -> None:
 
 def test_ini_end_transcript_generator_should_yield_nothing_if_content_is_empty() -> None:
     content = ""
-    values = list(v for v in ini_end_transcript_generator(content))
+    values = list(v for v in ini_end_transcript_generator(content, episode_length=1))
     assert len(values) == 0
 
 
@@ -183,19 +183,3 @@ def test_build_content_from_more_than_one_segment_should_work() -> None:
     assert index.search("episode_1", 3, 8) == "3 4 5 6 7"
     assert index.search("episode_1", 2, 13) == "2 3 4 5 6 7 8 9 10 11 12"
     assert index.search("episode_1", 6, 9) == "6 7 8"
-
-
-def test_index_for_episode_without_length() -> None:
-    content = """0:00
-    0 1 2 3
-    
-    0:04
-    4 5 6 7
-    """
-
-    index = BinarySearchTranscriptionIndex(SimpleTokenizer())
-    index.add("episode_1", content)
-
-    assert index.search("episode_1", 0, 4) == "0 1 2 3"
-    assert index.search("episode_1", 0, 5) == "0 1 2 3 4 5 6 7"
-    assert index.search("episode_1", 0, 6) == "0 1 2 3 4 5 6 7"

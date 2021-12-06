@@ -4,7 +4,7 @@ from index.binary_search import (
     search_end_ge,
     search_end_le,
 )
-from model import IntervalData, MAX_EPISODE_TIME
+from model import IntervalData
 
 
 def test_search_ini_le_should_return_the_largest_value_that_satisfies_the_inequality() -> None:
@@ -74,7 +74,6 @@ def test_search_ini_ge_should_return_the_smallest_value_that_satisfies_the_inequ
     assert search_ini_ge(v, 9.0) == 5
     assert search_ini_ge(v, 10.0) == 5
     assert search_ini_ge(v, 11.00001) is None
-    assert search_ini_ge(v, MAX_EPISODE_TIME) is None
 
 
 def test_search_ini_ge_should_return_the_same_value_for_each_position() -> None:
@@ -126,11 +125,3 @@ def test_all_searches_should_work_if_list_contains_same_value() -> None:
 
     assert search_ini_le(v, 0) is None
     assert search_ini_le(v, 2) == 99
-
-
-def test_all_searches_should_work_if_list_contains_all_max_time() -> None:
-    v = [IntervalData(ini=MAX_EPISODE_TIME, end=MAX_EPISODE_TIME) for i in range(100)]
-    assert search_ini_ge(v, 0) == 0
-    assert search_ini_ge(v, 2) == 0
-    assert search_ini_ge(v, MAX_EPISODE_TIME) == 0
-    assert search_ini_ge(v, MAX_EPISODE_TIME + 1) is None

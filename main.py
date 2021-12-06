@@ -3,7 +3,7 @@ from index.tokenizer import SimpleTokenizer
 
 index = BinarySearchTranscriptionIndex(SimpleTokenizer())
 with open('episode_1.txt', 'r', encoding='utf8') as fh:
-    index.add('episode_1', fh.read())
+    index.add('episode_1', fh.read(), episode_length=13*60+57)
 
 
 def retrieve_segment_transcript(episode_id: str, start_time: float, end_time: float) -> str:

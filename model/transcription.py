@@ -1,9 +1,6 @@
 from dataclasses import dataclass, field
 
 
-MAX_EPISODE_TIME = 1e10
-
-
 @dataclass
 class IntervalData:
     ini: float
